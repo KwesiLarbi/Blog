@@ -102,7 +102,7 @@ func Register() gin.HandlerFunc {
 		user.UpdatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
 		user.UserId = user.ID.Hex()
-		token, refreshToken, _ := GenerateAllTokens(*user.Email, *user.FirstName, *user.LastName, user.UserId)
+		token, refreshToken, _ := helpers.GenerateAllTokens(*user.Email, *user.FirstName, *user.LastName, user.UserId)
 		user.Token = &token
 		user.RefreshToken = &refreshToken
 
@@ -164,9 +164,9 @@ func Login() gin.HandlerFunc {
 			return
 		}
 
-		token, refreshToken, _ := GenerateAllTokens(*foundUser.Email, *foundUser.FirstName, *foundUser.LastName, foundUser.UserId)
+		token, refreshToken, _ := helpers.GenerateAllTokens(*foundUser.Email, *foundUser.FirstName, *foundUser.LastName, foundUser.UserId)
 
-		UpdateAllTokens(token, refreshToken, foundUser.UserId)
+		helpers.UpdateAllTokens(token, refreshToken, foundUser.UserId)
 
 		c.JSON(http.StatusOK, foundUser)
 	}
