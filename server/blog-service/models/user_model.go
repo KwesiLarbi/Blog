@@ -6,9 +6,14 @@ import (
 )
 
 type User struct {
-	ID				primitive.ObjectID 	`json:"_id,omitempty"`
-	Name 			string 				`json:"name,omitempty" validate:"required"`
-	Email			string 				`json:"email,omitempty" validate:"required"`
-	Password		string 				`json:"password,omitempty" validate:"required"`
-	CreationTime	time.Time			`json:"reation_time,omitempty" validate:"required"` 	
+	ID				primitive.ObjectID 	`bson:"_id"`
+	FirstName		*string				`json:"first_name" validate:"required,min=2,max=100"`
+	LastName		*string				`json:"last_name" validate:"required,min=2,max=100"`
+	Password		*string 			`json:"password,omitempty" validate:"required,min=6"`
+	Email			*string 			`json:"email,omitempty" validate:"required"`
+	Token			*string				`json:"token"`
+	RefreshToken	*string				`json:"refresh_token"`
+	CreatedAt		time.Time			`json:"created_at"`
+	UpdatedAt		time.Time			`json:"updated_at"`
+	UserId			string				`json:"user_id"`
 }

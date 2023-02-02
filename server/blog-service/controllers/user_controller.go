@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"time"
+	"log"
 
 	"github.com/KwesiLarbi/blog-service/configs"
 	"github.com/KwesiLarbi/blog-service/models"
