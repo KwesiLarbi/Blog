@@ -8,5 +8,5 @@ import (
 
 func UserRoutes(router *gin.Engine) {
 	router.POST("/user/register", controllers.Register())
-	router.POST("/users/login", controllers.Login())
+	router.POST("/user/login", controllers.Login())
 }
