@@ -22,6 +22,7 @@ func main() {
 	// User routes
 	routes.UserRoutes(router)
 
+	// All other routes requiring authentication are after the auth middleware
 	router.Use(middleware.Authentication())
 	
 	// Dummy API-1

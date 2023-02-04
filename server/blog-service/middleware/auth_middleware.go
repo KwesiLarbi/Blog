@@ -5,11 +5,14 @@ import (
 
 	"github.com/KwesiLarbi/blog-service/helpers"
 	"github.com/KwesiLarbi/blog-service/responses"
+
 	"github.com/gin-gonic/gin"
 )
 
+// Authentication validates token and authorizes users
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// gets client token from header, if no token, return no auth header provided
 		clientToken := c.Request.Header.Get("token")
 		if clientToken == "" {
 			c.JSON(http.StatusInternalServerError, responses.UserResponse{

@@ -10,22 +10,19 @@ import (
 )
 
 func ConnectDB() *mongo.Client {
+	// creating new client based on uri
 	client, err := mongo.NewClient(options.Client().ApplyURI(EnvMongoURI()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// context with timeout is mainly used when we want to make an
+	// external request, such as a database request
+	// create a context with a timeout of 10 seconds
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	// derfer cancel to prevent context leak
 	defer cancel()
 
 	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// ping the database to see if extists
-	err = client.Ping(ctx, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,11 +32,12 @@ func ConnectDB() *mongo.Client {
 	return client
 }
 
-// client instance
+// client database instance
 var DB *mongo.Client = ConnectDB()
 
-// gathering database collections
+// GetCollection is a function makes a connection with a collection in the database
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	collection := client.Database("blog").Collection(collectionName)
+	
 	return collection
 }

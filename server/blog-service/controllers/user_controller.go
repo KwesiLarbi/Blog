@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -41,19 +40,21 @@ func VerifyPassword(userPassword string, providedPassword string) (bool, string)
 	msg := ""
 
 	if err != nil {
-		msg = fmt.Sprintf("login or password is incorrect")
+		msg = "login or password is incorrect"
 		check = false
 	}
 
 	return check, msg
 }
 
+// Register is used to add a user to the db and get a single user
 func Register() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
-		var user models.User
 		defer cancel()
-
+		
+		var user models.User
+		
 		// validate the request body
 		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, responses.UserResponse{
@@ -65,7 +66,7 @@ func Register() gin.HandlerFunc {
 		}
 
 		// use the validator library to validate required fields
-		if validationErr := validate.Struct(&user); validationErr != nil {
+		if validationErr := validate.Struct(user); validationErr != nil {
 			c.JSON(http.StatusBadRequest, responses.UserResponse{
 				Status: http.StatusBadRequest,
 				Message: "error",
@@ -73,7 +74,7 @@ func Register() gin.HandlerFunc {
 			})
 			return
 		}
-
+		
 		count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 		defer cancel()
 		if err != nil {
@@ -85,10 +86,11 @@ func Register() gin.HandlerFunc {
 			})
 			return
 		}
-
+		
 		password := HashPassword(*user.Password)
 		user.Password = &password
-
+		
+		// if email count is greater than 0, then that means the email already exists
 		if count  > 0 {
 			c.JSON(http.StatusInternalServerError, responses.UserResponse{
 				Status: http.StatusInternalServerError,
@@ -108,7 +110,7 @@ func Register() gin.HandlerFunc {
 
 		result, err := userCollection.InsertOne(ctx, user)
 		if err != nil {
-			msg := fmt.Sprintf("User item was not created!")
+			msg := "User item was not created!"
 
 			c.JSON(http.StatusInternalServerError, responses.UserResponse{
 				Status: http.StatusInternalServerError,
@@ -127,6 +129,7 @@ func Register() gin.HandlerFunc {
 	}
 }
 
+// Login is used to validate and get a single user
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -155,7 +158,7 @@ func Login() gin.HandlerFunc {
 
 		passwordIsValid, msg := VerifyPassword(*user.Password, *foundUser.Password)
 		defer cancel()
-		if passwordIsValid != true {
+		if !passwordIsValid {
 			c.JSON(http.StatusInternalServerError, responses.UserResponse{
 				Status: http.StatusInternalServerError,
 				Message: "error",
