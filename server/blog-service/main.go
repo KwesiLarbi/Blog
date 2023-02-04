@@ -9,13 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		port = "8000"
-	}
-
+func setUpRouter() *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	
@@ -35,5 +29,16 @@ func main() {
 		c.JSON(200, gin.H{"success": "Access granted for api-2"})
 	})
 
+	return router
+}
+
+func main() {
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "8000"
+	}
+
+	router := setUpRouter()
 	router.Run(":" + port)
 }
